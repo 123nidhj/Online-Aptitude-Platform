@@ -19,14 +19,19 @@ public class UserController {
 
     // CREATE - Register new user
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+
         // Check if username already exists
         if (userRepository.existsByUsername(user.getUsername())) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT); // 409
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body("Username already exists. Please choose another.");
         }
+
         User savedUser = userRepository.save(user);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
+
 
     // READ - Get all users
     @GetMapping
@@ -45,13 +50,26 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    // Simple login (just checking username and password)
+    // LOGIN
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody User loginRequest) {
+    public ResponseEntity<?> login(@RequestBody User loginRequest) {
+
+        // Check if user exists
         User user = userRepository.findByUsername(loginRequest.getUsername()).orElse(null);
-        if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
+
+        if (user == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("User does not exist. Please create an account.");
         }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        // Check password
+        if (!user.getPassword().equals(loginRequest.getPassword())) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Incorrect password.");
+        }
+
+        return ResponseEntity.ok(user);
     }
 }
