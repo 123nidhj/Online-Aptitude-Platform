@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const SignUpPage = () => {
@@ -9,6 +9,21 @@ const SignUpPage = () => {
     password: "",
   });
 
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
+
+  const validateEmail = (email) => {
+    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return pattern.test(email);
+  };
+
+  const validatePassword = (password) => {
+    const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    return pattern.test(password);
+  };
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -16,10 +31,29 @@ const SignUpPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // save user to localStorage
+    let valid = true;
+    let newErrors = { email: "", password: "" };
+
+    // Email validation
+    if (!validateEmail(form.email)) {
+      newErrors.email = "Please enter a valid email address.";
+      valid = false;
+    }
+
+    // Password validation
+    if (!validatePassword(form.password)) {
+      newErrors.password =
+        "Password must be 8+ characters, include uppercase, lowercase, and a number.";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+
+    if (!valid) return;
+
+    // Save user to localStorage
     localStorage.setItem("user", JSON.stringify(form));
 
-    // redirect to login
     navigate("/login");
   };
 
@@ -41,25 +75,35 @@ const SignUpPage = () => {
             required
           />
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            className="w-full p-3 border rounded-lg"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
+          <div>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              className="w-full p-3 border rounded-lg"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
+          </div>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className="w-full p-3 border rounded-lg"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
+          <div>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              className="w-full p-3 border rounded-lg"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
+          </div>
 
           <button
             type="submit"
