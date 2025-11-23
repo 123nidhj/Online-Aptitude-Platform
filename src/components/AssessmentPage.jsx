@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 function AssessmentPage() {
   const questions = [
     {
       id: 1,
-      question: "If a train travels at 60 km/hr, how long will it take to cover 240 km?",
+      question:
+        "If a train travels at 60 km/hr, how long will it take to cover 240 km?",
       options: ["2 hours", "3 hours", "4 hours", "5 hours"],
       answer: "4 hours",
     },
@@ -16,7 +17,8 @@ function AssessmentPage() {
     },
     {
       id: 3,
-      question: "If A is twice as fast as B, and B takes 10 days to complete a task, how long will A take?",
+      question:
+        "If A is twice as fast as B, and B takes 10 days to complete a task, how long will A take?",
       options: ["20 days", "5 days", "10 days", "3 days"],
       answer: "5 days",
     },
@@ -31,14 +33,12 @@ function AssessmentPage() {
   };
 
   const score = Object.keys(selected).filter(
-    (qid) => selected[qid] === questions.find((q) => q.id == qid).answer
+    (qid) => selected[qid] === questions.find((q) => q.id === qid).answer
   ).length;
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">
-        Assessment
-      </h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">Assessment</h1>
 
       {!submitted ? (
         <div className="bg-white p-6 rounded-xl shadow max-w-3xl mx-auto">
@@ -97,9 +97,7 @@ function AssessmentPage() {
             Test Completed!
           </h2>
 
-          <p className="text-lg text-gray-700 mb-4">
-            Your Score:
-          </p>
+          <p className="text-lg text-gray-700 mb-4">Your Score:</p>
 
           <p className="text-5xl font-bold text-blue-600 mb-6">
             {score} / {questions.length}
