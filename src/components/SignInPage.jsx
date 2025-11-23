@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function SignInPage() {
@@ -6,29 +6,48 @@ function SignInPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // NEW
 
-  const handleSignIn = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
 
+    setErrorMessage(""); // clear old errors
+
     if (!email || !password) {
-      alert("Please fill in all fields.");
+      setErrorMessage("Please fill in all fields.");
       return;
     }
 
-    // temporary login success (no backend)
-    navigate("/dashboard");
+    // call backend
+    try {
+      const response = await fetch("http://localhost:8080/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: email, password }),
+      });
+
+      const data = await response.text();
+
+      if (!response.ok) {
+        setErrorMessage(data); // show backend message
+        return;
+      }
+
+      // success → navigate
+      navigate("/dashboard");
+    } catch (error) {
+      setErrorMessage("Email not found.Create an account first");
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-
         <h1 className="text-3xl font-bold text-center text-gray-900 mb-6">
           Sign In
         </h1>
 
         <form onSubmit={handleSignIn} className="space-y-5">
-
           <div>
             <label className="block text-gray-700 mb-1">Email</label>
             <input
@@ -51,6 +70,10 @@ function SignInPage() {
             />
           </div>
 
+          {errorMessage && (
+            <p className="text-red-600 text-sm text-center">{errorMessage}</p>
+          )}
+
           <button
             type="submit"
             className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition shadow"
@@ -65,10 +88,12 @@ function SignInPage() {
             Create one
           </Link>
         </p>
-
       </div>
     </div>
   );
 }
 
 export default SignInPage;
+
+
+
